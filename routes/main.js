@@ -3,6 +3,7 @@ const Category = require('../models/category');
 
 const checkJWT = require('../middlewares/check-jwt');
 const Product = require('../models/product');
+const async = require('async');
 
 router.route('/category')
     .get((req, res, next) => {
@@ -107,5 +108,21 @@ router.route('/product/:id')
       })
     })
   })
+
+router.post('/categorysearch',checkJWT, (req, res, next) => {
+
+      Product.find({$and:[{category: req.body.catid},{name:req.body.searchTxt}]})
+        .populate('category')
+        .exec((err, products) => {
+          if(products) {
+            res.json({
+              success: true,
+              message: 'Category Based Search Result',
+              products: products
+            })
+          }
+        });
+    
+});
 
 module.exports = router;
